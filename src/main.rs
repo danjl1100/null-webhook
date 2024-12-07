@@ -23,11 +23,12 @@ struct Args {
     /// Bind address for the server
     #[clap(env)]
     listen_address: std::net::SocketAddr,
+    /// Log all accesses to stdout
+    #[clap(long)]
+    log_accesses: bool,
 }
 
 fn main() -> eyre::Result<()> {
-    let app_context = null_webhook::AppContext::new();
-
     let (shutdown_tx, shutdown_rx) = std::sync::mpsc::channel();
     ctrlc::set_handler(move || {
         eprintln!("user requested shutdown...");
@@ -46,10 +47,19 @@ fn main() -> eyre::Result<()> {
         }
     });
 
-    let Args { listen_address } = Args::parse();
-    let args = null_webhook::Args::listen(listen_address);
-    app_context
-        .server_builder(&args)
+    let Args {
+        listen_address,
+        log_accesses,
+    } = Args::parse();
+
+    let args = {
+        let mut args = null_webhook::Args::listen(listen_address);
+        if log_accesses {
+            args = args.log_accesses();
+        }
+        args
+    };
+    args.as_server_builder()
         .set_ready_sender(ready_tx)
         .set_shutdown_receiver(shutdown_rx)
         .serve()?;

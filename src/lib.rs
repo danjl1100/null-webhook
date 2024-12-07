@@ -8,11 +8,21 @@ pub use server::Error as ServerError;
 pub struct Args {
     /// Bind address for the server
     listen_address: std::net::SocketAddr,
+    /// Log all accesses to stdout
+    log_accesses: bool,
 }
 impl Args {
     /// Configure listenining with basic authentication
     pub fn listen(listen_address: std::net::SocketAddr) -> Self {
-        Self { listen_address }
+        Self {
+            listen_address,
+            log_accesses: false,
+        }
+    }
+    /// Enables printing a message on all accesses
+    pub fn log_accesses(mut self) -> Self {
+        self.log_accesses = true;
+        self
     }
 }
 
@@ -22,24 +32,8 @@ pub struct Shutdown;
 /// Signal that the server is ready to receive requests
 pub struct Ready;
 
-/// System local-time context for calculating durations
-#[must_use]
-pub struct AppContext {}
-
-impl Default for AppContext {
-    fn default() -> Self {
-        Self::new()
-    }
-}
-impl AppContext {
-    /// TODO remove the struct if unused
-    pub fn new() -> Self {
-        Self {}
-    }
-}
-
 mod server {
-    use crate::{AppContext, Args, Ready, Shutdown};
+    use crate::{Args, Ready, Shutdown};
     use std::{net::SocketAddr, time::Duration};
     use tiny_http::Response;
 
@@ -51,11 +45,11 @@ mod server {
         shutdown_rx: Option<std::sync::mpsc::Receiver<Shutdown>>,
     }
 
-    impl AppContext {
+    impl Args {
         /// Returns an HTTP server builder
-        pub fn server_builder<'a>(&self, args: &'a Args) -> Builder<'a> {
+        pub fn as_server_builder(&self) -> Builder<'_> {
             Builder {
-                args,
+                args: self,
                 ready_tx: None,
                 shutdown_rx: None,
             }
@@ -89,7 +83,11 @@ mod server {
         ///
         pub fn serve(self) -> Result<(), Error> {
             let Self {
-                args: Args { listen_address },
+                args:
+                    args @ Args {
+                        listen_address,
+                        log_accesses: _,
+                    },
                 mut ready_tx,
                 mut shutdown_rx,
             } = self;
@@ -109,7 +107,7 @@ mod server {
             }
 
             while Self::check_shutdown(shutdown_rx.as_mut()).is_none() {
-                let _ = Self::serve_next_peer(&server);
+                let _ = Self::serve_next_peer(&server, args);
             }
             Ok(())
         }
@@ -134,7 +132,7 @@ mod server {
                     }
                 })
         }
-        fn serve_next_peer(server: &tiny_http::Server) -> Result<(), Error> {
+        fn serve_next_peer(server: &tiny_http::Server, args: &Args) -> Result<(), Error> {
             const RECV_TIMEOUT: Duration = Duration::from_millis(100);
             const RECV_SLEEP: Duration = Duration::from_millis(10);
             const HTTP_STATUS_OK: u32 = 200;
@@ -147,7 +145,9 @@ mod server {
                     kind: ErrorKind::PeerRecv,
                 })?
             {
-                println!("{request:?}");
+                if args.log_accesses {
+                    println!("{request:?}");
+                }
                 request
                     .respond(Response::empty(HTTP_STATUS_OK))
                     .map_err(Box::new)

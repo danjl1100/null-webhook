@@ -21,6 +21,7 @@ fn empty() -> eyre::Result<()> {
     // startup server
     let (output, responses) = BinCommand::new()
         .arg(LISTEN_ADDRESS)
+        .arg("--log-accesses")
         .spawn_cleanup_with(|| {
             // request from `/metrics` endpoint
             let metrics = minreq::get(format!("http://{listen_address}/metrics")).send();
@@ -51,7 +52,16 @@ fn empty() -> eyre::Result<()> {
         // 1. once for fail-fast startup run, and
         // 2. again for the "/metrics" request
         insta::assert_snapshot!(stderr, @"user requested shutdown...\n");
-        insta::assert_snapshot!(stdout, @"Listening at http://127.0.0.1:9582 (and will reply to all HTTP requests with empty body, OK 200)");
+        insta::with_settings!({filters => vec![
+            (r":[0-9]+", "[:PORT]"),
+        ]}, {
+            insta::assert_snapshot!(stdout, @r###"
+            Listening at http://127.0.0.1[:PORT] (and will reply to all HTTP requests with empty body, OK 200)
+            Request(GET /metrics from Some(127.0.0.1[:PORT]))
+            Request(GET / from Some(127.0.0.1[:PORT]))
+            Request(GET /unknown from Some(127.0.0.1[:PORT]))
+            "###);
+        });
         assert!(
             status.success(),
             "verify sleep duration after SIGINT, killing too early?"
