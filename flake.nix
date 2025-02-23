@@ -20,7 +20,6 @@
   outputs = {
     # common
     self,
-    flake-utils,
     nixpkgs,
     flake-compat,
     # rust
@@ -32,6 +31,7 @@
       "x86_64-linux"
       "aarch64-darwin"
     ];
+    flake-utils = import ./nix/flake-utils.nix;
     arguments.parent_overlay = rust-overlay.overlays.default;
     arguments.for_package = {
       inherit
