@@ -4,16 +4,12 @@
   description = "webhook that does nothing with the information";
 
   inputs = {
-    rust-overlay = {
-      url = "github:oxalica/rust-overlay";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     crane.url = "github:ipetkov/crane";
     advisory-db = {
       url = "github:rustsec/advisory-db";
       flake = false;
     };
-    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.05";
+    nixpkgs.url = "github:nixos/nixpkgs?ref=nixos-24.11";
     flake-compat.url = "github:nix-community/flake-compat";
   };
 
@@ -23,7 +19,6 @@
     nixpkgs,
     flake-compat,
     # rust
-    rust-overlay,
     crane,
     advisory-db,
   }: let
@@ -32,7 +27,6 @@
       "aarch64-darwin"
     ];
     flake-utils = import ./nix/flake-utils.nix;
-    arguments.parent_overlay = rust-overlay.overlays.default;
     arguments.for_package = {
       inherit
         advisory-db
@@ -50,7 +44,6 @@
       system: let
         pkgs = import nixpkgs {
           inherit system;
-          overlays = [arguments.parent_overlay];
         };
 
         package = pkgs.callPackage ./nix/package.nix arguments.for_package;
@@ -78,14 +71,6 @@
           vm-tests = pkgs.callPackage ./nix/vm-tests {
             inherit (nixos) nixosModules;
           };
-        in {
-          ${crate-name} = package.${crate-name};
-          default = package.${crate-name};
-
-          inherit
-            vm-tests
-            systemd-render-check
-            ;
 
           all-long-tests = pkgs.symlinkJoin {
             name = "all-long-tests";
@@ -95,6 +80,18 @@
               systemd-render-check
             ];
           };
+        in {
+          ${crate-name} = package.${crate-name};
+          default = package.${crate-name};
+
+          inherit
+            all-long-tests
+            vm-tests
+            systemd-render-check
+            ;
+
+          # alias for convenience
+          ci = all-long-tests;
         };
 
         devShells = {
@@ -112,16 +109,11 @@
     )
     // {
       overlays.default = final: prev: let
-        # apply parent overlay
-        parent_overlay = arguments.parent_overlay final prev;
-
         package = final.callPackage ./nix/package.nix arguments.for_package;
-      in
-        parent_overlay
-        // {
-          # NOTE: infinite recursion when using `${crate-name} = ...` syntax
-          inherit (package) null-webhook;
-        };
+      in {
+        # NOTE: infinite recursion when using `${crate-name} = ...` syntax
+        inherit (package) null-webhook;
+      };
 
       inherit (nixos) nixosModules;
 
