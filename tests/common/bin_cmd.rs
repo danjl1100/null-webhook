@@ -15,7 +15,7 @@ impl BinCommand {
     pub fn new() -> Self {
         Self::default()
     }
-    pub fn arg(mut self, arg: &'static str) -> Self {
+    pub fn arg(mut self, arg: impl std::fmt::Display) -> Self {
         self.args.push(arg.to_string());
         self
     }

@@ -2,9 +2,8 @@ use super::MiniReqResult;
 use crate::{
     assert_response,
     common::bin_cmd::{BinCommand, BinOutput},
-    HTTP_OK,
+    get_random_port_listen_addr, HTTP_OK,
 };
-use std::{net::SocketAddr, str::FromStr};
 
 struct Responses {
     metrics: MiniReqResult,
@@ -14,13 +13,11 @@ struct Responses {
 
 #[test]
 fn empty() -> eyre::Result<()> {
-    const LISTEN_ADDRESS: &str = crate::common::LISTEN_ADDRESS;
-
-    let listen_address = SocketAddr::from_str(LISTEN_ADDRESS)?;
+    let listen_address = get_random_port_listen_addr()?;
 
     // startup server
     let (output, responses) = BinCommand::new()
-        .arg(LISTEN_ADDRESS)
+        .arg(&listen_address)
         .spawn_cleanup_with(|| {
             // request from `/metrics` endpoint
             let metrics = minreq::get(format!("http://{listen_address}/metrics")).send();
@@ -46,12 +43,8 @@ fn empty() -> eyre::Result<()> {
         } = output;
 
         // no fatal errors
-        //
-        // "NOTSURE?" is mentioned twice:
-        // 1. once for fail-fast startup run, and
-        // 2. again for the "/metrics" request
-        insta::assert_snapshot!(stderr, @"user requested shutdown...\n");
-        insta::assert_snapshot!(stdout, @"Listening at http://127.0.0.1:9582 (and will reply to all HTTP requests with empty body, OK 200)");
+        assert_eq!(stderr, "user requested shutdown...\n");
+        assert_eq!(stdout, format!("Listening at http://{listen_address} (and will reply to all HTTP requests with empty body, OK 200)\n"));
         assert!(
             status.success(),
             "verify sleep duration after SIGINT, killing too early?"

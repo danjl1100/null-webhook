@@ -2,9 +2,8 @@ use super::MiniReqResult;
 use crate::{
     assert_response,
     common::bin_cmd::{BinCommand, BinOutput},
-    HTTP_OK,
+    get_random_port_listen_addr, HTTP_OK,
 };
-use std::{net::SocketAddr, str::FromStr};
 
 struct Responses {
     metrics: MiniReqResult,
@@ -14,13 +13,11 @@ struct Responses {
 
 #[test]
 fn empty() -> eyre::Result<()> {
-    const LISTEN_ADDRESS: &str = crate::common::LISTEN_ADDRESS;
-
-    let listen_address = SocketAddr::from_str(LISTEN_ADDRESS)?;
+    let listen_address = get_random_port_listen_addr()?;
 
     // startup server
     let (output, responses) = BinCommand::new()
-        .arg(LISTEN_ADDRESS)
+        .arg(&listen_address)
         .arg("--log-accesses")
         .spawn_cleanup_with(|| {
             // request from `/metrics` endpoint
@@ -47,10 +44,6 @@ fn empty() -> eyre::Result<()> {
         } = output;
 
         // no fatal errors
-        //
-        // "NOTSURE?" is mentioned twice:
-        // 1. once for fail-fast startup run, and
-        // 2. again for the "/metrics" request
         insta::assert_snapshot!(stderr, @"user requested shutdown...\n");
         insta::with_settings!({filters => vec![
             (r":[0-9]+", "[:PORT]"),
