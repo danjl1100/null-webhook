@@ -1,0 +1,30 @@
+
+# cargo-vet audits file
+
+[[audits.cfg-if]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "1.0.0 -> 1.0.3"
+notes = """
+No unsafe ambient capabilities seen, the crate is entirely a macro that selects
+branches of the caller's input code. (seems low risk)
+"""
+
+[[audits.heck]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "0.4.1 -> 0.5.0"
+notes = """
+Only significant delta is removing `unicode_segmentation` optional dependency,
+still has crate-wide `#![forbid(unsafe_code)]` and no added ambient capabilities.
+"""
+
+[[audits.proc-macro2]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "1.0.94 -> 1.0.101"
+notes = """
+Ambient capabilities probing for rustc features is modified but appears
+functionally the same.  No changes in unsafe noted, only unsafe is for
+unchecked from str and TokenStream::take_inner which changes into RcVec.
+"""
