@@ -10,6 +10,21 @@ No unsafe ambient capabilities seen, the crate is entirely a macro that selects
 branches of the caller's input code. (seems low risk)
 """
 
+[[audits.cfg_aliases]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "0.1.1"
+notes = """
+No unsafe, reads cargo environment variables to determine which features to
+enable in the user's build.rs
+"""
+
+[[audits.colorchoice]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "1.0.4"
+notes = "No unsafe, just an enum <--> usize with a static getter/setter"
+
 [[audits.heck]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
 criteria = "safe-to-deploy"
@@ -18,6 +33,18 @@ notes = """
 Only significant delta is removing `unicode_segmentation` optional dependency,
 still has crate-wide `#![forbid(unsafe_code)]` and no added ambient capabilities.
 """
+
+[[audits.is_terminal_polyfill]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "1.70.1"
+notes = "Literally a trait wrapping calls to std::io::IsTerminal::is_terminal, no unsafe"
+
+[[audits.once_cell_polyfill]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "1.70.1"
+notes = "No unsafe, polyfill wrapper for std::sync::OnceLock"
 
 [[audits.proc-macro2]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
