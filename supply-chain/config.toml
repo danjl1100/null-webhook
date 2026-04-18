@@ -25,14 +25,6 @@ criteria = "safe-to-deploy"
 version = "0.2.7"
 criteria = "safe-to-deploy"
 
-[[exemptions.anstyle-query]]
-version = "1.1.4"
-criteria = "safe-to-deploy"
-
-[[exemptions.anstyle-wincon]]
-version = "3.0.10"
-criteria = "safe-to-deploy"
-
 [[exemptions.clap]]
 version = "4.5.47"
 criteria = "safe-to-deploy"
@@ -43,10 +35,6 @@ criteria = "safe-to-deploy"
 
 [[exemptions.clap_derive]]
 version = "4.5.47"
-criteria = "safe-to-deploy"
-
-[[exemptions.clap_lex]]
-version = "0.7.5"
 criteria = "safe-to-deploy"
 
 [[exemptions.console]]
@@ -63,10 +51,6 @@ criteria = "safe-to-run"
 
 [[exemptions.eyre]]
 version = "0.6.12"
-criteria = "safe-to-deploy"
-
-[[exemptions.indenter]]
-version = "0.3.4"
 criteria = "safe-to-deploy"
 
 [[exemptions.insta]]
