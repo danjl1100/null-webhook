@@ -105,10 +105,6 @@ criteria = "safe-to-run"
 version = "0.8.6"
 criteria = "safe-to-run"
 
-[[exemptions.sd-notify]]
-version = "0.4.5"
-criteria = "safe-to-deploy"
-
 [[exemptions.similar]]
 version = "2.7.0"
 criteria = "safe-to-run"

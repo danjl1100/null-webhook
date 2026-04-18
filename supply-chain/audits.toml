@@ -55,3 +55,23 @@ Ambient capabilities probing for rustc features is modified but appears
 functionally the same.  No changes in unsafe noted, only unsafe is for
 unchecked from str and TokenStream::take_inner which changes into RcVec.
 """
+
+[[audits.sd-notify]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "0.5.0"
+notes = """
+Two categories of unsafe:
+1. unset_env - obligations forwarded to caller as unsafe functions
+2. libc socket / file descriptor interaction required for connecting to systemd
+"""
+
+[[audits.sd-notify]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+violation = "^0.4.5"
+notes = """
+Somewhat dubious use of unset_env, which is handled better in the next 0.5.0 version.
+Unsafe is required for libc and interacting with the systemd sockets and file
+descriptor settings.
+"""
