@@ -1,6 +1,18 @@
 
 # cargo-vet audits file
 
+[[audits.anstyle-parse]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "0.2.7"
+notes = """
+Unsafe usage around MaybeUninit has some room for cleanup
+<https://github.com/rust-cli/anstyle/issues/300>
+and unsafe transmutes to 16-value `#[repr(u8)]` enums are only enforced via
+a doc comment, but overall the current version appears valid as-is.
+No ambient capabilities noted.
+"""
+
 [[audits.anstyle-query]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
 criteria = "safe-to-deploy"
@@ -37,6 +49,21 @@ No unsafe, reads cargo environment variables to determine which features to
 enable in the user's build.rs
 """
 
+[[audits.clap]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "4.5.20 -> 4.5.47"
+notes = """
+No changes to unsafe or really any meaningful behavior, mostly changing tutorial docs
+and other examples.
+"""
+
+[[audits.clap_builder]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "4.5.18 -> 4.5.47"
+notes = "No unsafe. Some logic changes, but nothing noted as being an ambient capability change."
+
 [[audits.clap_lex]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
 criteria = "safe-to-deploy"
@@ -51,6 +78,15 @@ who = "Daniel Lambert <danjl1100@gmail.com>"
 criteria = "safe-to-deploy"
 version = "1.0.4"
 notes = "No unsafe, just an enum <--> usize with a static getter/setter"
+
+[[audits.ctrlc]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+version = "3.4.7"
+notes = """
+Unsafe usage for setting system-specific callbacks, unix pipes and windows semaphore.
+Could not identify any safety violations on unix (windows rustdoc wasn't loading in).
+"""
 
 [[audits.heck]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
@@ -73,6 +109,15 @@ criteria = "safe-to-deploy"
 version = "1.70.1"
 notes = "Literally a trait wrapping calls to std::io::IsTerminal::is_terminal, no unsafe"
 
+[[audits.memchr]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "2.7.2 -> 2.7.5"
+notes = """
+Contains lots of unsafe, but this delta only adds a test case, fixes docs, and
+removes some BITS constants
+"""
+
 [[audits.once_cell_polyfill]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
 criteria = "safe-to-deploy"
@@ -88,6 +133,12 @@ Ambient capabilities probing for rustc features is modified but appears
 functionally the same.  No changes in unsafe noted, only unsafe is for
 unchecked from str and TokenStream::take_inner which changes into RcVec.
 """
+
+[[audits.regex-syntax]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "0.8.5 -> 0.8.6"
+notes = "Forbids unsafe in code and readme. Only change is doc comment typos"
 
 [[audits.sd-notify]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
@@ -108,3 +159,9 @@ Somewhat dubious use of unset_env, which is handled better in the next 0.5.0 ver
 Unsafe is required for libc and interacting with the systemd sockets and file
 descriptor settings.
 """
+
+[[audits.similar]]
+who = "Daniel Lambert <danjl1100@gmail.com>"
+criteria = "safe-to-deploy"
+delta = "2.2.0 -> 2.2.1"
+notes = "No unsafe present at all. Delta only adds one early return case, small."

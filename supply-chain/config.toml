@@ -7,6 +7,9 @@ version = "0.10"
 [imports.bytecode-alliance]
 url = "https://raw.githubusercontent.com/bytecodealliance/wasmtime/main/supply-chain/audits.toml"
 
+[imports.danjl1100]
+url = "https://raw.githubusercontent.com/danjl1100/supply-chain/refs/heads/main/audits.toml"
+
 [imports.google]
 url = "https://raw.githubusercontent.com/google/supply-chain/main/audits.toml"
 
@@ -21,18 +24,6 @@ criteria = "safe-to-deploy"
 version = "1.0.11"
 criteria = "safe-to-deploy"
 
-[[exemptions.anstyle-parse]]
-version = "0.2.7"
-criteria = "safe-to-deploy"
-
-[[exemptions.clap]]
-version = "4.5.47"
-criteria = "safe-to-deploy"
-
-[[exemptions.clap_builder]]
-version = "4.5.47"
-criteria = "safe-to-deploy"
-
 [[exemptions.clap_derive]]
 version = "4.5.47"
 criteria = "safe-to-deploy"
@@ -40,10 +31,6 @@ criteria = "safe-to-deploy"
 [[exemptions.console]]
 version = "0.15.11"
 criteria = "safe-to-run"
-
-[[exemptions.ctrlc]]
-version = "3.4.7"
-criteria = "safe-to-deploy"
 
 [[exemptions.encode_unicode]]
 version = "1.0.0"
@@ -60,10 +47,6 @@ criteria = "safe-to-run"
 [[exemptions.libc]]
 version = "0.2.175"
 criteria = "safe-to-deploy"
-
-[[exemptions.memchr]]
-version = "2.7.5"
-criteria = "safe-to-run"
 
 [[exemptions.minreq]]
 version = "2.14.1"
@@ -83,14 +66,6 @@ criteria = "safe-to-run"
 
 [[exemptions.regex-automata]]
 version = "0.4.10"
-criteria = "safe-to-run"
-
-[[exemptions.regex-syntax]]
-version = "0.8.6"
-criteria = "safe-to-run"
-
-[[exemptions.similar]]
-version = "2.7.0"
 criteria = "safe-to-run"
 
 [[exemptions.syn]]
