@@ -153,7 +153,7 @@ Two categories of unsafe:
 [[audits.sd-notify]]
 who = "Daniel Lambert <danjl1100@gmail.com>"
 criteria = "safe-to-deploy"
-violation = "^0.4.5"
+violation = "^0.4.0"
 notes = """
 Somewhat dubious use of unset_env, which is handled better in the next 0.5.0 version.
 Unsafe is required for libc and interacting with the systemd sockets and file
